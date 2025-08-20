@@ -1,6 +1,7 @@
-import { Text, View } from 'react-native';
+import { Text, View } from "react-native";
+import { useThemeColors } from "./ThemeProvider";
 
-import { EditScreenInfo } from './EditScreenInfo';
+import { EditScreenInfo } from "./EditScreenInfo";
 
 type ScreenContentProps = {
   title: string;
@@ -8,18 +9,34 @@ type ScreenContentProps = {
   children?: React.ReactNode;
 };
 
-export const ScreenContent = ({ title, path, children }: ScreenContentProps) => {
+export const ScreenContent = ({
+  title,
+  path,
+  children,
+}: ScreenContentProps) => {
+  const colors = useThemeColors();
+
   return (
-    <View className={styles.container}>
-      <Text className={styles.title}>{title}</Text>
-      <View className={styles.separator} />
+    <View className="items-center flex-1 justify-center">
+      <Text
+        style={{
+          fontSize: 20,
+          fontWeight: "bold",
+          color: colors.primary,
+        }}
+      >
+        {title}
+      </Text>
+      <View
+        style={{
+          height: 1,
+          marginVertical: 28,
+          width: "80%",
+          backgroundColor: colors.border,
+        }}
+      />
       <EditScreenInfo path={path} />
       {children}
     </View>
   );
-};
-const styles = {
-  container: `items-center flex-1 justify-center`,
-  separator: `h-[1px] my-7 w-4/5 bg-gray-200`,
-  title: `text-xl font-bold`,
 };
