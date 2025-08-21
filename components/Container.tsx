@@ -1,4 +1,4 @@
-import { SafeAreaView } from "react-native";
+import { SafeAreaView, View } from "react-native";
 import { useThemeColors } from "./ThemeProvider";
 
 export const Container = ({ children }: { children: React.ReactNode }) => {
@@ -8,11 +8,16 @@ export const Container = ({ children }: { children: React.ReactNode }) => {
     <SafeAreaView
       style={{
         flex: 1,
-        margin: 24,
         backgroundColor: colors.background,
       }}
     >
-      {children}
+      <View
+        style={{
+          flex: 1,
+        }}
+      >
+        {children}
+      </View>
     </SafeAreaView>
   );
 };

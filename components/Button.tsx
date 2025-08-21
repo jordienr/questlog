@@ -5,6 +5,7 @@ import {
   TouchableOpacityProps,
   View,
 } from "react-native";
+import { useThemeColors } from "./ThemeProvider";
 
 type ButtonProps = {
   title: string;
@@ -12,13 +13,32 @@ type ButtonProps = {
 
 export const Button = forwardRef<View, ButtonProps>(
   ({ title, ...touchableProps }, ref) => {
+    const colors = useThemeColors();
     return (
       <TouchableOpacity
         ref={ref}
         {...touchableProps}
         className={`${styles.button} ${touchableProps.className}`}
       >
-        <Text className={styles.buttonText}>{title}</Text>
+        <View
+          style={{ backgroundColor: colors.foreground }}
+          className="h-8 w-4"
+        />
+        <View
+          style={{ backgroundColor: colors.foreground }}
+          className="h-14 w-full flex flex-row items-center justify-center"
+        >
+          <Text
+            className={styles.buttonText}
+            style={{ color: colors.background }}
+          >
+            {title}
+          </Text>
+        </View>
+        <View
+          style={{ backgroundColor: colors.foreground }}
+          className="w-4 h-8"
+        />
       </TouchableOpacity>
     );
   },
@@ -27,6 +47,6 @@ export const Button = forwardRef<View, ButtonProps>(
 Button.displayName = "Button";
 
 const styles = {
-  button: "items-center bg-indigo-500 rounded-[28px] shadow-md p-4",
-  buttonText: "text-white text-lg font-semibold text-center",
+  button: "relative flex flex-row items-center justify-center",
+  buttonText: "font-silk text-lg text-center",
 };

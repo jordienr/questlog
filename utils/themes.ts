@@ -1,6 +1,7 @@
 import { ThemeType } from "../store/store";
 
 export interface ThemeColors {
+  foreground: string;
   background: string;
   surface: string;
   primary: string;
@@ -14,6 +15,7 @@ export interface ThemeColors {
 
 export const themes: Record<ThemeType, ThemeColors> = {
   dark: {
+    foreground: "#ffffff",
     background: "#000000",
     surface: "#111111",
     primary: "#ffffff",
@@ -25,6 +27,7 @@ export const themes: Record<ThemeType, ThemeColors> = {
     warning: "#f59e0b",
   },
   light: {
+    foreground: "#000000",
     background: "#ffffff",
     surface: "#f9fafb",
     primary: "#000000",
@@ -36,6 +39,7 @@ export const themes: Record<ThemeType, ThemeColors> = {
     warning: "#f59e0b",
   },
   parchment: {
+    foreground: "#3d2907",
     background: "#faf8f3",
     surface: "#f5f2eb",
     primary: "#574435",

@@ -4,6 +4,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { Stack } from "expo-router";
 import { useFonts } from "expo-font";
 import { Silkscreen_400Regular } from "@expo-google-fonts/silkscreen";
+import { Jacquard24_400Regular } from "@expo-google-fonts/jacquard-24";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
 import { ThemeProvider } from "../components/ThemeProvider";
@@ -18,6 +19,7 @@ export const unstable_settings = {
 export default function RootLayout() {
   const [fontsLoaded] = useFonts({
     Silkscreen_400Regular,
+    Jacquard24_400Regular,
   });
 
   useEffect(() => {
@@ -28,7 +30,7 @@ export default function RootLayout() {
 
   return (
     <ThemeProvider>
-      <GestureHandlerRootView style={{ flex: 1 }} className="font-silkscreen">
+      <GestureHandlerRootView style={{ flex: 1 }}>
         <Stack>
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         </Stack>

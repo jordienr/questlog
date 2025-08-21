@@ -12,6 +12,7 @@
     "web": "expo start --web"
   },
   "dependencies": {
+    "@expo-google-fonts/jacquard-24": "^0.4.0",
     "@expo-google-fonts/silkscreen": "^0.4.1",
     "@expo/vector-icons": "^14.0.0",
     "@react-native-async-storage/async-storage": "2.1.2",
@@ -36,6 +37,7 @@
     "react-native-reanimated": "~3.17.4",
     "react-native-safe-area-context": "5.4.0",
     "react-native-screens": "~4.11.1",
+    "react-native-svg": "15.11.2",
     "react-native-web": "^0.20.0",
     "zustand": "^5.0.8"
   },
@@ -48,6 +50,7 @@
     "eslint-config-prettier": "^10.1.2",
     "prettier": "^3.2.5",
     "prettier-plugin-tailwindcss": "^0.5.11",
+    "react-native-svg-transformer": "^1.5.1",
     "tailwindcss": "^3.4.0",
     "typescript": "~5.8.3"
   },
