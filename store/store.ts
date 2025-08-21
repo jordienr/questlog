@@ -29,3 +29,49 @@ export const useThemeStore = create<ThemeState>()(
     },
   ),
 );
+
+export type Quest = { title: string; isChecked: boolean };
+
+export interface QuestState {
+  quests: Quest[];
+  addQuest: (title: string) => void;
+  toggleQuest: (title: string) => void;
+  removeQuest: (title: string) => void;
+  clearCompleted: () => void;
+}
+
+export const useQuestStore = create<QuestState>()(
+  persist(
+    (set, get) => ({
+      quests: [],
+      addQuest: (title: string) => {
+        const trimmed = title.trim();
+        if (!trimmed) return;
+        const { quests } = get();
+        if (quests.some((q) => q.title.toLowerCase() === trimmed.toLowerCase()))
+          return;
+        set({ quests: [{ title: trimmed, isChecked: false }, ...quests] });
+      },
+      toggleQuest: (title: string) => {
+        const { quests } = get();
+        set({
+          quests: quests.map((q) =>
+            q.title === title ? { ...q, isChecked: !q.isChecked } : q,
+          ),
+        });
+      },
+      removeQuest: (title: string) => {
+        const { quests } = get();
+        set({ quests: quests.filter((q) => q.title !== title) });
+      },
+      clearCompleted: () => {
+        const { quests } = get();
+        set({ quests: quests.filter((q) => !q.isChecked) });
+      },
+    }),
+    {
+      name: "quests-storage",
+      storage: createJSONStorage(() => AsyncStorage),
+    },
+  ),
+);

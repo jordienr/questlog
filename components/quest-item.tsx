@@ -5,10 +5,12 @@ export function QuestItem({
   title,
   isChecked,
   onChange,
+  onLongPress,
 }: {
   title: string;
   isChecked: boolean;
   onChange: (isChecked: boolean) => void;
+  onLongPress?: () => void;
 }) {
   const colors = useThemeColors();
 
@@ -16,7 +18,14 @@ export function QuestItem({
     <Pressable
       className="flex-row items-center gap-2 p-4"
       onPress={() => onChange(!isChecked)}
+      onLongPress={onLongPress}
     >
+      <Text
+        className="font-bold font-silk mt-2 text-3xl"
+        style={{ color: colors.foreground, opacity: isChecked ? 0.5 : 1 }}
+      >
+        {isChecked ? "◆" : "◇"}
+      </Text>
       <Text
         className="text-lg font-bold font-silk"
         style={{
