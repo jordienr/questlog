@@ -6,7 +6,8 @@ import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
 import { ThemeProvider } from "../components/ThemeProvider";
-import { usePlayerStore } from "~/store/store";
+import { useGameStore } from "~/store/store";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -21,7 +22,9 @@ export default function RootLayout() {
     Jacquard24_400Regular: require("../assets/fonts/Jacquard24_400Regular.ttf"),
   });
 
-  const { name } = usePlayerStore();
+  const {
+    player: { name },
+  } = useGameStore();
 
   useEffect(() => {
     if (fontsLoaded) {
@@ -36,13 +39,18 @@ export default function RootLayout() {
   }, [fontsLoaded, name]);
 
   return (
-    <ThemeProvider>
-      <GestureHandlerRootView style={{ flex: 1 }}>
-        <Stack>
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen name="(onboarding)" options={{ headerShown: false }} />
-        </Stack>
-      </GestureHandlerRootView>
-    </ThemeProvider>
+    <SafeAreaProvider>
+      <ThemeProvider>
+        <GestureHandlerRootView style={{ flex: 1 }}>
+          <Stack>
+            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+            <Stack.Screen
+              name="(onboarding)"
+              options={{ headerShown: false }}
+            />
+          </Stack>
+        </GestureHandlerRootView>
+      </ThemeProvider>
+    </SafeAreaProvider>
   );
 }

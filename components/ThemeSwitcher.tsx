@@ -1,16 +1,16 @@
 import React from "react";
-import { View } from "react-native";
-import { useTheme } from "./ThemeProvider";
-import { PixelButton } from "./PixelButton";
+import { Pressable, Text, View } from "react-native";
+import { useTheme, useThemeColors } from "./ThemeProvider";
 import { ThemeType } from "../store/store";
 
 export const ThemeSwitcher: React.FC = () => {
   const { currentTheme, setTheme } = useTheme();
+  const colors = useThemeColors();
 
   const themes: { key: ThemeType; label: string }[] = [
     { key: "dark", label: "Dark" },
     { key: "light", label: "Light" },
-    { key: "parchment", label: "Parchment" },
+    { key: "parchment", label: "Script" },
   ];
 
   return (
@@ -18,19 +18,32 @@ export const ThemeSwitcher: React.FC = () => {
       <View style={{ alignItems: "center", marginBottom: 8 }}>
         <View
           style={{
-            flexDirection: "column",
+            flexDirection: "row",
             gap: 8,
             justifyContent: "center",
           }}
         >
           {themes.map((theme) => (
-            <PixelButton
+            <Pressable
               key={theme.key}
-              title={theme.label}
               onPress={() => setTheme(theme.key)}
-              variant={currentTheme === theme.key ? "accent" : "secondary"}
-              size="medium"
-            />
+              className="border p-2"
+              style={{
+                borderColor: colors.border,
+              }}
+            >
+              <Text
+                className={`font-silk text-lg`}
+                style={{
+                  color:
+                    currentTheme === theme.key
+                      ? colors.accent
+                      : colors.secondary,
+                }}
+              >
+                {theme.label}
+              </Text>
+            </Pressable>
           ))}
         </View>
       </View>

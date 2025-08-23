@@ -12,6 +12,12 @@ export interface ThemeColors {
   error: string;
   success: string;
   warning: string;
+  // New colors for Dark Souls-style overlays
+  overlayBg: string;
+  overlayText: string;
+  overlayGlow: string;
+  overlayAccent: string;
+  overlayLine: string;
 }
 
 export const themes: Record<ThemeType, ThemeColors> = {
@@ -27,6 +33,11 @@ export const themes: Record<ThemeType, ThemeColors> = {
     error: "#ef4444",
     success: "#22c55e",
     warning: "#f59e0b",
+    overlayBg: "rgba(0, 0, 0, 0.92)",
+    overlayText: "#ffffff",
+    overlayGlow: "#F4852A",
+    overlayAccent: "#F4852A",
+    overlayLine: "#F4852A",
   },
   light: {
     foreground: "#000000",
@@ -40,6 +51,11 @@ export const themes: Record<ThemeType, ThemeColors> = {
     error: "#ef4444",
     success: "#22c55e",
     warning: "#f59e0b",
+    overlayBg: "rgba(255, 255, 255, 0.95)",
+    overlayText: "#000000",
+    overlayGlow: "#3b82f6",
+    overlayAccent: "#3b82f6",
+    overlayLine: "#3b82f6",
   },
   parchment: {
     foreground: "#3d2907",
@@ -53,6 +69,11 @@ export const themes: Record<ThemeType, ThemeColors> = {
     error: "#b91c1c",
     success: "#15803d",
     warning: "#a16207",
+    overlayBg: "rgba(58, 41, 7, 0.9)",
+    overlayText: "#faf8f3",
+    overlayGlow: "#b45309",
+    overlayAccent: "#b45309",
+    overlayLine: "#b45309",
   },
 };
 

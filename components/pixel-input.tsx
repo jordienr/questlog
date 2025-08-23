@@ -1,4 +1,4 @@
-import { Text, TextInput, View } from "react-native";
+import { TextInput, View } from "react-native";
 import { useThemeColors } from "./ThemeProvider";
 
 export function PixelInput({
@@ -14,21 +14,13 @@ export function PixelInput({
 
   return (
     <View
-      className="flex-row items-center gap-2 border-2 border-dashed h-14"
+      className="flex-row items-center gap-2 border h-14"
       style={{
-        borderColor: theme.accent,
+        borderColor: theme.border,
       }}
     >
-      <Text
-        className="text-center font-silk text-sm px-2 opacity-50"
-        style={{
-          color: theme.primary,
-        }}
-      >
-        {">"}
-      </Text>
       <TextInput
-        className="font-silk p-2 min-w-[200px]"
+        className="font-silk p-2 min-w-[200px] placeholder:text-gray-500/50"
         placeholder={placeholder}
         value={value}
         onChangeText={onChangeText}

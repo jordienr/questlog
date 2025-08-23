@@ -12,23 +12,19 @@ export function PixelSection({
 
   return (
     <View
-      style={[{ backgroundColor: colors.background }, style]}
-      className="flex flex-row items-center justify-center border h-full"
+      style={[
+        {
+          backgroundColor: colors.background,
+          borderWidth: 2,
+          borderColor: colors.border,
+          padding: 16,
+          marginBottom: 8,
+        },
+        style,
+      ]}
+      className="rounded"
     >
-      <View
-        style={{ backgroundColor: colors.background }}
-        className="h-8 w-4"
-      />
-      <View
-        style={{ backgroundColor: colors.background }}
-        className="h-14 items-center justify-center"
-      >
-        {children}
-      </View>
-      <View
-        style={{ backgroundColor: colors.background }}
-        className="w-4 h-8"
-      />
+      {children}
     </View>
   );
 }

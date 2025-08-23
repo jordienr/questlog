@@ -18,7 +18,7 @@ export function MainLayout({
   return (
     <Container>
       <Text
-        className="font-jac text-5xl p-4 text-center"
+        className="font-jac text-4xl p-8 text-center"
         style={{ color: colors.foreground }}
       >
         {title}
@@ -33,8 +33,10 @@ export function MainLayout({
           </Text>
         </View>
       )}
-      <View>{children}</View>
-      {action && <View className="mt-auto px-8 py-2">{action}</View>}
+      <View className="flex-1">
+        {children}
+        {action && <View className="absolute bottom-4 right-4">{action}</View>}
+      </View>
     </Container>
   );
 }

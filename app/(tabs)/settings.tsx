@@ -1,23 +1,74 @@
 import { Stack } from "expo-router";
-import { View, Text } from "react-native";
+import { View, Text, Alert, ScrollView } from "react-native";
 import { useThemeColors } from "../../components/ThemeProvider";
+import { useEffect, useState } from "react";
 
 import { Container } from "~/components/Container";
 import { ThemeSwitcher } from "~/components/ThemeSwitcher";
 import { PixelSection } from "~/components/pixel-section";
 import { PixelInput } from "~/components/pixel-input";
-import { usePlayerStore } from "~/store/store";
+import { PixelButton } from "~/components/PixelButton";
+import { useGameStore } from "~/store/store";
+import { AchievementToast } from "~/components/achievement-toast";
 
 export default function Settings() {
   const colors = useThemeColors();
-  const { name, setName } = usePlayerStore();
+  const {
+    player: { name },
+    setName,
+    reset,
+    newlyUnlockedAchievements,
+    clearNewlyUnlockedAchievements,
+  } = useGameStore();
+
+  // Achievement toast state
+  const [showAchievementToast, setShowAchievementToast] = useState(false);
+  const [currentAchievement, setCurrentAchievement] = useState<{
+    title: string;
+    description: string;
+  } | null>(null);
+
+  // Check for newly unlocked achievements
+  useEffect(() => {
+    if (newlyUnlockedAchievements.length > 0) {
+      const achievement = newlyUnlockedAchievements[0];
+      setCurrentAchievement({
+        title: achievement.title,
+        description: achievement.description,
+      });
+      setShowAchievementToast(true);
+      clearNewlyUnlockedAchievements();
+    }
+  }, [newlyUnlockedAchievements]);
+
+  const handleResetAllData = () => {
+    Alert.alert(
+      "Reset All Data",
+      "This will reset your player progress, quests, and all local data. This action cannot be undone.",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Reset Everything",
+          style: "destructive",
+          onPress: () => {
+            reset();
+            Alert.alert(
+              "Data Reset",
+              "All local data has been reset successfully. You may need to restart the app.",
+              [{ text: "OK" }],
+            );
+          },
+        },
+      ],
+    );
+  };
 
   return (
     <Container>
       <Stack.Screen options={{ title: "Settings" }} />
-      <PixelSection>
+      <ScrollView className="flex-1 p-4" showsVerticalScrollIndicator={false}>
         <Text
-          className="font-silk mb-4 text-xl"
+          className="font-jac mb-4 text-4xl"
           style={{ color: colors.foreground }}
         >
           Player Settings
@@ -46,7 +97,30 @@ export default function Settings() {
           </Text>
           <ThemeSwitcher />
         </View>
-      </PixelSection>
+
+        {/* Reset All Data Section - Available for all users */}
+        <View className="mt-8 mb-6 px-4">
+          <PixelButton
+            title="Reset All Data"
+            variant="error"
+            onPress={handleResetAllData}
+          />
+          <Text
+            className="font-silk text-xs text-center mt-2"
+            style={{ color: colors.secondary }}
+          >
+            This will reset your player progress, quests, and all local data
+          </Text>
+        </View>
+      </ScrollView>
+      {/* Achievement Toast */}
+      {currentAchievement && (
+        <AchievementToast
+          visible={showAchievementToast}
+          onHide={() => setShowAchievementToast(false)}
+          achievement={currentAchievement}
+        />
+      )}
     </Container>
   );
 }
