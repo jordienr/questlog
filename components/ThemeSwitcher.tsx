@@ -7,10 +7,10 @@ import { ThemeType } from "../store/store";
 export const ThemeSwitcher: React.FC = () => {
   const { currentTheme, setTheme } = useTheme();
 
-  const themes: { key: ThemeType; label: string; emoji: string }[] = [
-    { key: "dark", label: "Dark", emoji: "🌙" },
-    { key: "light", label: "Light", emoji: "☀️" },
-    { key: "parchment", label: "Parchment", emoji: "📜" },
+  const themes: { key: ThemeType; label: string }[] = [
+    { key: "dark", label: "Dark" },
+    { key: "light", label: "Light" },
+    { key: "parchment", label: "Parchment" },
   ];
 
   return (
@@ -18,16 +18,15 @@ export const ThemeSwitcher: React.FC = () => {
       <View style={{ alignItems: "center", marginBottom: 8 }}>
         <View
           style={{
-            flexDirection: "row",
+            flexDirection: "column",
             gap: 8,
-            flexWrap: "wrap",
             justifyContent: "center",
           }}
         >
           {themes.map((theme) => (
             <PixelButton
               key={theme.key}
-              title={`${theme.emoji} ${theme.label}`}
+              title={theme.label}
               onPress={() => setTheme(theme.key)}
               variant={currentTheme === theme.key ? "accent" : "secondary"}
               size="medium"

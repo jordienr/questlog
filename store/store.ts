@@ -75,3 +75,29 @@ export const useQuestStore = create<QuestState>()(
     },
   ),
 );
+
+export interface PlayerState {
+  name: string;
+  setName: (name: string) => void;
+  level: number;
+  setLevel: (level: number) => void;
+  xp: number;
+  setXp: (xp: number) => void;
+}
+
+export const usePlayerStore = create<PlayerState>()(
+  persist(
+    (set) => ({
+      name: "",
+      setName: (name: string) => set({ name }),
+      level: 1,
+      setLevel: (level: number) => set({ level }),
+      xp: 0,
+      setXp: (xp: number) => set({ xp }),
+    }),
+    {
+      name: "player-storage",
+      storage: createJSONStorage(() => AsyncStorage),
+    },
+  ),
+);

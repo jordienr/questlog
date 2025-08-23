@@ -16,8 +16,8 @@
         "expo-font",
         {
           "fonts": [
-            "node_modules/@expo-google-fonts/silkscreen/400Regular/Silkscreen_400Regular.ttf",
-            "node_modules/@expo-google-fonts/jacquard-24/400Regular/Jacquard24_400Regular.ttf"
+            "./assets/fonts/Silkscreen_400Regular.ttf",
+            "./assets/fonts/Jacquard24_400Regular.ttf"
           ]
         }
       ]

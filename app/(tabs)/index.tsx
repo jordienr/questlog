@@ -5,7 +5,7 @@ import { useThemeColors } from "~/components/ThemeProvider";
 import { Button } from "~/components/Button";
 import { QuestItem } from "~/components/quest-item";
 import { useMemo, useRef, useState } from "react";
-import { useQuestStore } from "~/store/store";
+import { usePlayerStore, useQuestStore } from "~/store/store";
 
 export default function Home() {
   const colors = useThemeColors();
@@ -14,25 +14,40 @@ export default function Home() {
   const [newTitle, setNewTitle] = useState("");
   const inputRef = useRef<TextInput>(null);
 
+  const { name } = usePlayerStore();
+
   const canSubmit = useMemo(() => newTitle.trim().length > 0, [newTitle]);
 
   return (
     <>
-      <Stack.Screen options={{ title: "Questlog" }} />
+      <Stack.Screen options={{ title: "Quests" }} />
       <MainLayout
         title="Questlog"
-        caption="This is a record of your adventures. It's a place to keep track of your quests, and a place to reflect on your journey."
+        caption={`Welcome back, ${name}.`}
         action={
-          <Button title="+ Add Quest" onPress={() => setIsAddOpen(true)} />
+          quests.length >= 1 ? (
+            <Button title="+ Add Quest" onPress={() => setIsAddOpen(true)} />
+          ) : null
         }
       >
         <View>
-          {/* <Text
-            className="text-xl font-silk p-4 text-center"
-            style={{ color: colors.foreground }}
-          >
-            Welcome back, traveler.
-          </Text> */}
+          {quests.length === 0 && (
+            <View className="p-8">
+              <Text
+                className="font-silk text-center text-lg mt-40"
+                style={{ color: colors.secondary }}
+              >
+                Adventure awaits.
+              </Text>
+              <Text
+                className="font-silk text-center text-lg mb-4"
+                style={{ color: colors.secondary }}
+              >
+                Start by adding a quest.
+              </Text>
+              <Button title="+ Add Quest" onPress={() => setIsAddOpen(true)} />
+            </View>
+          )}
           {quests.map((quest) => (
             <QuestItem
               key={quest.title}

@@ -24,12 +24,14 @@ export function MainLayout({
         {title}
       </Text>
       {caption && (
-        <Text
-          className="font-silk text-lg p-4 text-center"
-          style={{ color: colors.secondary }}
-        >
-          {caption}
-        </Text>
+        <View className="px-4">
+          <Text
+            className="font-silk text-lg p-4 text-center"
+            style={{ color: colors.secondary }}
+          >
+            {caption}
+          </Text>
+        </View>
       )}
       <View>{children}</View>
       {action && <View className="mt-auto px-8 py-2">{action}</View>}

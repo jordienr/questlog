@@ -1,13 +1,12 @@
 import "../global.css";
 
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { Stack } from "expo-router";
+import { Redirect, router, Stack } from "expo-router";
 import { useFonts } from "expo-font";
-import { Silkscreen_400Regular } from "@expo-google-fonts/silkscreen";
-import { Jacquard24_400Regular } from "@expo-google-fonts/jacquard-24";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
 import { ThemeProvider } from "../components/ThemeProvider";
+import { usePlayerStore } from "~/store/store";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -18,21 +17,30 @@ export const unstable_settings = {
 
 export default function RootLayout() {
   const [fontsLoaded] = useFonts({
-    Silkscreen_400Regular,
-    Jacquard24_400Regular,
+    Silkscreen_400Regular: require("../assets/fonts/Silkscreen_400Regular.ttf"),
+    Jacquard24_400Regular: require("../assets/fonts/Jacquard24_400Regular.ttf"),
   });
+
+  const { name } = usePlayerStore();
 
   useEffect(() => {
     if (fontsLoaded) {
       SplashScreen.hideAsync();
+
+      setTimeout(() => {
+        if (!name || name.length === 0) {
+          router.replace("/(onboarding)");
+        }
+      }, 1000);
     }
-  }, [fontsLoaded]);
+  }, [fontsLoaded, name]);
 
   return (
     <ThemeProvider>
       <GestureHandlerRootView style={{ flex: 1 }}>
         <Stack>
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen name="(onboarding)" options={{ headerShown: false }} />
         </Stack>
       </GestureHandlerRootView>
     </ThemeProvider>

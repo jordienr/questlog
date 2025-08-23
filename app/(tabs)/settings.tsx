@@ -3,72 +3,50 @@ import { View, Text } from "react-native";
 import { useThemeColors } from "../../components/ThemeProvider";
 
 import { Container } from "~/components/Container";
-import { ScreenContent } from "~/components/ScreenContent";
 import { ThemeSwitcher } from "~/components/ThemeSwitcher";
+import { PixelSection } from "~/components/pixel-section";
+import { PixelInput } from "~/components/pixel-input";
+import { usePlayerStore } from "~/store/store";
 
 export default function Settings() {
   const colors = useThemeColors();
+  const { name, setName } = usePlayerStore();
 
   return (
-    <>
+    <Container>
       <Stack.Screen options={{ title: "Settings" }} />
-      <Container>
-        <ScreenContent path="app/(tabs)/settings.tsx" title="Settings">
-          <View style={{ marginTop: 32, gap: 16 }}>
-            <View
-              style={{
-                backgroundColor: colors.surface,
-                padding: 16,
-                borderRadius: 8,
-                borderWidth: 1,
-                borderColor: colors.border,
-              }}
-            >
-              <Text
-                style={{
-                  color: colors.primary,
-                  fontSize: 18,
-                  fontFamily: "Silkscreen_400Regular",
-                  marginBottom: 8,
-                }}
-              >
-                Customize Your Experience 🎨
-              </Text>
-              <Text style={{ color: colors.secondary }}>
-                Choose your preferred theme to personalize the app&apos;s
-                appearance.
-              </Text>
-            </View>
+      <PixelSection>
+        <Text
+          className="font-silk mb-4 text-xl"
+          style={{ color: colors.foreground }}
+        >
+          Player Settings
+        </Text>
 
-            {/* Icon Showcase */}
-            <View
-              style={{
-                backgroundColor: colors.surface,
-                padding: 16,
-                borderRadius: 8,
-                borderWidth: 1,
-                borderColor: colors.border,
-              }}
-            >
-              <Text
-                style={{
-                  color: colors.primary,
-                  fontSize: 16,
-                  fontFamily: "Silkscreen_400Regular",
-                  marginBottom: 12,
-                  textAlign: "center",
-                }}
-              >
-                Available Icons
-              </Text>
-            </View>
-          </View>
-        </ScreenContent>
+        <View className="mb-6">
+          <Text
+            className="font-silk mb-2 text-lg"
+            style={{ color: colors.foreground }}
+          >
+            Your Name
+          </Text>
+          <PixelInput
+            placeholder="Enter your name"
+            value={name}
+            onChangeText={setName}
+          />
+        </View>
 
-        <View style={{ marginTop: 24 }}>
+        <View className="mb-6">
+          <Text
+            className="font-silk mb-2 text-lg"
+            style={{ color: colors.foreground }}
+          >
+            Theme
+          </Text>
           <ThemeSwitcher />
         </View>
-      </Container>
-    </>
+      </PixelSection>
+    </Container>
   );
 }

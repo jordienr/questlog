@@ -3,6 +3,7 @@ import { ThemeType } from "../store/store";
 export interface ThemeColors {
   foreground: string;
   background: string;
+  background2: string;
   surface: string;
   primary: string;
   secondary: string;
@@ -17,10 +18,11 @@ export const themes: Record<ThemeType, ThemeColors> = {
   dark: {
     foreground: "#ffffff",
     background: "#000000",
+    background2: "#111111",
     surface: "#111111",
     primary: "#ffffff",
     secondary: "#9ca3af",
-    accent: "#3b82f6",
+    accent: "#F4852A",
     border: "#374151",
     error: "#ef4444",
     success: "#22c55e",
@@ -29,6 +31,7 @@ export const themes: Record<ThemeType, ThemeColors> = {
   light: {
     foreground: "#000000",
     background: "#ffffff",
+    background2: "#f9fafb",
     surface: "#f9fafb",
     primary: "#000000",
     secondary: "#6b7280",
@@ -41,6 +44,7 @@ export const themes: Record<ThemeType, ThemeColors> = {
   parchment: {
     foreground: "#3d2907",
     background: "#faf8f3",
+    background2: "oklch(83.7% 0.128 66.29)",
     surface: "#f5f2eb",
     primary: "#574435",
     secondary: "#8b7355",

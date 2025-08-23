@@ -12,21 +12,21 @@ export function PixelSection({
 
   return (
     <View
-      style={[{ backgroundColor: colors.foreground }, style]}
-      className="flex flex-row items-center justify-center"
+      style={[{ backgroundColor: colors.background }, style]}
+      className="flex flex-row items-center justify-center border h-full"
     >
       <View
-        style={{ backgroundColor: colors.foreground }}
+        style={{ backgroundColor: colors.background }}
         className="h-8 w-4"
       />
       <View
-        style={{ backgroundColor: colors.foreground }}
-        className="h-14 w-full flex flex-row items-center justify-center"
+        style={{ backgroundColor: colors.background }}
+        className="h-14 items-center justify-center"
       >
         {children}
       </View>
       <View
-        style={{ backgroundColor: colors.foreground }}
+        style={{ backgroundColor: colors.background }}
         className="w-4 h-8"
       />
     </View>
