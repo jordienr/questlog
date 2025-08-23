@@ -8,7 +8,6 @@ import {
   Pressable,
   Alert,
   SafeAreaView,
-  ScrollView,
   KeyboardAvoidingView,
   Platform,
 } from "react-native";
@@ -20,6 +19,9 @@ import { useGameStore } from "~/store/store";
 import { ExperienceBar } from "~/components/experience-bar";
 import { QuestCompletionOverlay } from "~/components/quest-completion-overlay";
 import { AchievementToast } from "~/components/achievement-toast";
+import DraggableFlatList, {
+  ScaleDecorator,
+} from "react-native-draggable-flatlist";
 
 export default function Home() {
   const colors = useThemeColors();
@@ -28,10 +30,10 @@ export default function Home() {
     toggleQuest,
     addQuest,
     removeQuest,
+    reorderQuests,
     player: { name, xp, level },
     setXp,
     setLevel,
-    achievements,
     newlyUnlockedAchievements,
     clearNewlyUnlockedAchievements,
   } = useGameStore();
@@ -67,7 +69,7 @@ export default function Home() {
       setShowAchievementToast(true);
       clearNewlyUnlockedAchievements();
     }
-  }, [newlyUnlockedAchievements]);
+  }, [newlyUnlockedAchievements, clearNewlyUnlockedAchievements]);
 
   // Handle quest completion overlay dismissal
   const handleOverlayComplete = useCallback(() => {
@@ -107,80 +109,101 @@ export default function Home() {
                 Adventure awaits, {name}.
               </Text>
               <Button title="+ Add Quest" onPress={() => setIsAddOpen(true)} />
+              <View className="mt-4">
+                <Button
+                  title="Add Sample Quests"
+                  variant="secondary"
+                  onPress={() => {
+                    addQuest("Complete the tutorial");
+                    addQuest("Read a book");
+                    addQuest("Go for a walk");
+                  }}
+                />
+              </View>
             </View>
           )}
           <SafeAreaView
             className="p-4 pt-12 mt-2"
             style={{ backgroundColor: colors.background2 }}
           >
-            <ScrollView className="">
-              {quests.map((quest) => (
-                <QuestItem
-                  key={quest.title}
-                  title={quest.title}
-                  isChecked={quest.isChecked}
-                  onChange={() => {
-                    const wasCompleted = quest.isChecked;
-                    toggleQuest(quest.title);
+            {quests.length > 0 && (
+              <DraggableFlatList
+                data={quests}
+                onDragEnd={({ data }) => reorderQuests(data)}
+                keyExtractor={(item) => item.title}
+                renderItem={({ item, drag, isActive }) => {
+                  return (
+                    <ScaleDecorator>
+                      <QuestItem
+                        title={item.title}
+                        isChecked={item.isChecked}
+                        onChange={() => {
+                          const wasCompleted = item.isChecked;
+                          toggleQuest(item.title);
 
-                    // Only show completion modal when completing a quest (not uncompleting)
-                    if (!wasCompleted) {
-                      const xpModifier = level > 10 ? 10 : 20;
-                      const newXp = xp + xpModifier;
-                      const didLevelUp = newXp >= 100;
-                      const finalXp = didLevelUp ? 0 : newXp;
-                      const finalLevel = didLevelUp ? level + 1 : level;
+                          // Only show completion modal when completing a quest (not uncompleting)
+                          if (!wasCompleted) {
+                            const xpModifier = level > 10 ? 10 : 20;
+                            const newXp = xp + xpModifier;
+                            const didLevelUp = newXp >= 100;
+                            const finalXp = didLevelUp ? 0 : newXp;
+                            const finalLevel = didLevelUp ? level + 1 : level;
 
-                      // Update player state
-                      if (didLevelUp) {
-                        setLevel(finalLevel);
-                        setXp(finalXp);
-                      } else {
-                        setXp(finalXp);
-                      }
+                            // Update player state
+                            if (didLevelUp) {
+                              setLevel(finalLevel);
+                              setXp(finalXp);
+                            } else {
+                              setXp(finalXp);
+                            }
 
-                      // Show completion modal
-                      setCompletionData({
-                        questTitle: quest.title,
-                        experienceGained: xpModifier,
-                        didLevelUp,
-                        newLevel: didLevelUp ? finalLevel : undefined,
-                        newXp: finalXp,
-                      });
-                      setShowCompletionOverlay(true);
-                    } else {
-                      // Uncompleting a quest
-                      const xpModifier = level > 10 ? 10 : 20;
-                      const xpChange = -xpModifier;
-                      const newXp = xp + xpChange;
+                            // Show completion modal
+                            setCompletionData({
+                              questTitle: item.title,
+                              experienceGained: xpModifier,
+                              didLevelUp,
+                              newLevel: didLevelUp ? finalLevel : undefined,
+                              newXp: finalXp,
+                            });
+                            setShowCompletionOverlay(true);
+                          } else {
+                            // Uncompleting a quest
+                            const xpModifier = level > 10 ? 10 : 20;
+                            const xpChange = -xpModifier;
+                            const newXp = xp + xpChange;
 
-                      if (newXp < 0 && level > 1) {
-                        setLevel(level - 1);
-                        setXp(100 + newXp);
-                      } else if (newXp < 0) {
-                        setXp(0);
-                      } else {
-                        setXp(newXp);
-                      }
-                    }
-                  }}
-                  onLongPress={() => {
-                    Alert.alert(
-                      "Delete quest",
-                      `Are you sure you want to delete "${quest.title}"?`,
-                      [
-                        { text: "Cancel", style: "cancel" },
-                        {
-                          text: "Delete",
-                          style: "destructive",
-                          onPress: () => removeQuest(quest.title),
-                        },
-                      ],
-                    );
-                  }}
-                />
-              ))}
-            </ScrollView>
+                            if (newXp < 0 && level > 1) {
+                              setLevel(level - 1);
+                              setXp(100 + newXp);
+                            } else if (newXp < 0) {
+                              setXp(0);
+                            } else {
+                              setXp(newXp);
+                            }
+                          }
+                        }}
+                        onDelete={() => {
+                          Alert.alert(
+                            "Delete quest",
+                            `Are you sure you want to delete "${item.title}"?`,
+                            [
+                              { text: "Cancel", style: "cancel" },
+                              {
+                                text: "Delete",
+                                style: "destructive",
+                                onPress: () => removeQuest(item.title),
+                              },
+                            ],
+                          );
+                        }}
+                        drag={drag}
+                        isActive={isActive}
+                      />
+                    </ScaleDecorator>
+                  );
+                }}
+              />
+            )}
           </SafeAreaView>
         </View>
       </MainLayout>

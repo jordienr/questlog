@@ -89,6 +89,7 @@ export interface GameState {
   addQuest: (title: string) => void;
   toggleQuest: (title: string) => void;
   removeQuest: (title: string) => void;
+  reorderQuests: (newQuests: Quest[]) => void;
   clearCompleted: () => void;
   reset: () => void;
   unlockAchievement: (achievementId: string) => void;
@@ -456,6 +457,12 @@ export const useGameStore = create<GameState>()(
           },
         }));
         get().checkAchievements();
+      },
+
+      reorderQuests: (newQuests: Quest[]) => {
+        set((state) => ({
+          quests: newQuests,
+        }));
       },
 
       clearCompleted: () => {
