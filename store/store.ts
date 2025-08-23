@@ -49,7 +49,8 @@ export interface AchievementRequirement {
     | "quests_completed"
     | "quests_deleted"
     | "level_reached"
-    | "xp_gained";
+    | "xp_gained"
+    | "current_streak";
   value: number;
   current: number;
 }
@@ -160,6 +161,166 @@ const defaultAchievements: Achievement[] = [
     category: "quests",
     isUnlocked: false,
     requirements: [{ type: "quests_deleted", value: 3, current: 0 }],
+  },
+  {
+    id: "cleaner_10",
+    title: "Clean Slate",
+    description: "Delete 10 quests",
+    category: "quests",
+    isUnlocked: false,
+    requirements: [{ type: "quests_deleted", value: 10, current: 0 }],
+  },
+  {
+    id: "quest_master_25",
+    title: "Quest Legend",
+    description: "Complete 25 quests",
+    category: "quests",
+    isUnlocked: false,
+    requirements: [{ type: "quests_completed", value: 25, current: 0 }],
+  },
+  {
+    id: "quest_master_50",
+    title: "Quest Grandmaster",
+    description: "Complete 50 quests",
+    category: "quests",
+    isUnlocked: false,
+    requirements: [{ type: "quests_completed", value: 50, current: 0 }],
+  },
+  {
+    id: "quest_creator_10",
+    title: "Quest Architect",
+    description: "Create 10 quests",
+    category: "quests",
+    isUnlocked: false,
+    requirements: [{ type: "quests_created", value: 10, current: 0 }],
+  },
+  {
+    id: "quest_creator_25",
+    title: "Quest Designer",
+    description: "Create 25 quests",
+    category: "quests",
+    isUnlocked: false,
+    requirements: [{ type: "quests_created", value: 25, current: 0 }],
+  },
+  {
+    id: "streak_7",
+    title: "Week Warrior",
+    description: "Maintain a 7-day streak",
+    category: "quests",
+    isUnlocked: false,
+    requirements: [{ type: "current_streak", value: 7, current: 0 }],
+  },
+  {
+    id: "streak_30",
+    title: "Monthly Master",
+    description: "Maintain a 30-day streak",
+    category: "quests",
+    isUnlocked: false,
+    requirements: [{ type: "current_streak", value: 30, current: 0 }],
+  },
+  {
+    id: "level_10",
+    title: "Veteran",
+    description: "Reach level 10",
+    category: "player",
+    isUnlocked: false,
+    requirements: [{ type: "level_reached", value: 10, current: 1 }],
+  },
+  {
+    id: "level_20",
+    title: "Elite",
+    description: "Reach level 20",
+    category: "player",
+    isUnlocked: false,
+    requirements: [{ type: "level_reached", value: 20, current: 1 }],
+  },
+  {
+    id: "level_50",
+    title: "Legendary",
+    description: "Reach level 50",
+    category: "player",
+    isUnlocked: false,
+    requirements: [{ type: "level_reached", value: 50, current: 1 }],
+  },
+  {
+    id: "xp_1000",
+    title: "XP Collector",
+    description: "Gain 1000 total XP",
+    category: "player",
+    isUnlocked: false,
+    requirements: [{ type: "xp_gained", value: 1000, current: 0 }],
+  },
+  {
+    id: "xp_5000",
+    title: "XP Hoarder",
+    description: "Gain 5000 total XP",
+    category: "player",
+    isUnlocked: false,
+    requirements: [{ type: "xp_gained", value: 5000, current: 0 }],
+  },
+  {
+    id: "xp_10000",
+    title: "XP Master",
+    description: "Gain 10000 total XP",
+    category: "player",
+    isUnlocked: false,
+    requirements: [{ type: "xp_gained", value: 10000, current: 0 }],
+  },
+  {
+    id: "balanced_player",
+    title: "Balanced Player",
+    description: "Have 5+ quests created, completed, and deleted",
+    category: "general",
+    isUnlocked: false,
+    requirements: [
+      { type: "quests_created", value: 5, current: 0 },
+      { type: "quests_completed", value: 5, current: 0 },
+      { type: "quests_deleted", value: 5, current: 0 },
+    ],
+  },
+  {
+    id: "quest_hoarder",
+    title: "Quest Hoarder",
+    description: "Have 20+ quests created but less than 5 completed",
+    category: "quests",
+    isUnlocked: false,
+    requirements: [
+      { type: "quests_created", value: 20, current: 0 },
+      { type: "quests_completed", value: 5, current: 0 },
+    ],
+  },
+  {
+    id: "efficiency_expert",
+    title: "Efficiency Expert",
+    description: "Complete 80% of created quests (min 10 created)",
+    category: "quests",
+    isUnlocked: false,
+    requirements: [
+      { type: "quests_created", value: 10, current: 0 },
+      { type: "quests_completed", value: 8, current: 0 },
+    ],
+  },
+  {
+    id: "streak_champion",
+    title: "Streak Champion",
+    description: "Reach level 10 and maintain a 7-day streak",
+    category: "general",
+    isUnlocked: false,
+    requirements: [
+      { type: "level_reached", value: 10, current: 1 },
+      { type: "current_streak", value: 7, current: 0 },
+    ],
+  },
+  {
+    id: "xp_streak_master",
+    title: "XP Streak Master",
+    description: "Gain 2000 XP and maintain a 5-day streak",
+    category: "general",
+    isUnlocked: false,
+    requirements: [
+      { type: "xp_gained", value: 2000, current: 0 },
+      { type: "current_streak", value: 5, current: 0 },
+    ],
   },
 ];
 
@@ -393,14 +554,43 @@ export const useGameStore = create<GameState>()(
               case "xp_gained":
                 current = player.stats.totalXpGained;
                 break;
-            }
-
-            if (current < req.value) {
-              shouldUnlock = false;
+              case "current_streak":
+                current = player.stats.currentStreak;
+                break;
             }
 
             return { ...req, current };
           });
+
+          // Check if all requirements are met
+          updatedRequirements.forEach((req) => {
+            if (req.current < req.value) {
+              shouldUnlock = false;
+            }
+          });
+
+          // Special logic for complex achievements
+          if (shouldUnlock) {
+            switch (achievement.id) {
+              case "quest_hoarder":
+                // Need 20+ created but less than 5 completed
+                shouldUnlock =
+                  player.stats.totalQuestsCreated >= 20 &&
+                  player.stats.totalQuestsCompleted < 5;
+                break;
+              case "efficiency_expert":
+                // Need 80% completion rate with min 10 created
+                shouldUnlock =
+                  player.stats.totalQuestsCreated >= 10 &&
+                  player.stats.totalQuestsCompleted /
+                    player.stats.totalQuestsCreated >=
+                    0.8;
+                break;
+              default:
+                // For regular achievements, use the standard logic
+                break;
+            }
+          }
 
           if (shouldUnlock) {
             get().unlockAchievement(achievement.id);
