@@ -35,7 +35,7 @@ export function MainLayout({
       )}
       <View className="flex-1">
         {children}
-        {action && <View className="absolute bottom-4 right-4">{action}</View>}
+        {action && <View className="absolute bottom-8 right-14">{action}</View>}
       </View>
     </Container>
   );

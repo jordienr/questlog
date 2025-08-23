@@ -270,7 +270,22 @@ export default function Stats() {
                             style={{ color: colors.accent }}
                           >
                             Unlocked:{" "}
-                            {achievement.unlockedAt.toLocaleDateString()}
+                            {(() => {
+                              try {
+                                if (achievement.unlockedAt instanceof Date) {
+                                  return achievement.unlockedAt.toLocaleDateString();
+                                } else if (
+                                  typeof achievement.unlockedAt === "string"
+                                ) {
+                                  return new Date(
+                                    achievement.unlockedAt,
+                                  ).toLocaleDateString();
+                                }
+                                return "Recently";
+                              } catch (error) {
+                                return "Recently";
+                              }
+                            })()}
                           </Text>
                         )}
                       </View>

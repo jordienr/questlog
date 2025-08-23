@@ -54,7 +54,7 @@ export const Button = forwardRef<View, ButtonProps>(
             borderColor: colors.border,
           }}
           className={`h-14 min-w-8 flex flex-row items-center justify-center px-4 ${
-            size === "icon" ? "w-14" : "px-6"
+            size === "icon" ? "px-2" : "px-6"
           } ${fullWidth ? "flex-1" : ""}`}
         >
           <Text

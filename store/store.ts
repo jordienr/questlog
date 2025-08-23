@@ -417,6 +417,23 @@ export const useGameStore = create<GameState>()(
     {
       name: "game-storage",
       storage: createJSONStorage(() => AsyncStorage),
+      // Migration function to convert string dates back to Date objects
+      migrate: (persistedState: any, version: number) => {
+        if (persistedState && persistedState.achievements) {
+          // Convert string dates back to Date objects
+          persistedState.achievements = persistedState.achievements.map(
+            (achievement: any) => ({
+              ...achievement,
+              unlockedAt:
+                achievement.unlockedAt &&
+                typeof achievement.unlockedAt === "string"
+                  ? new Date(achievement.unlockedAt)
+                  : achievement.unlockedAt,
+            }),
+          );
+        }
+        return persistedState;
+      },
     },
   ),
 );
