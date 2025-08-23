@@ -1,16 +1,9 @@
-import {
-  Text,
-  Animated,
-  Dimensions,
-  Pressable,
-  PanResponder,
-  View,
-} from "react-native";
+import { Text, Animated, Dimensions, Pressable, View } from "react-native";
 import { useThemeColors } from "./ThemeProvider";
-import { useRef, useCallback } from "react";
+import { useRef } from "react";
+import { Swipeable } from "react-native-gesture-handler";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
-const SWIPE_THRESHOLD = -80;
 
 export function QuestItem({
   title,
@@ -28,114 +21,66 @@ export function QuestItem({
   isActive?: boolean;
 }) {
   const colors = useThemeColors();
-  const translateX = useRef(new Animated.Value(0)).current;
-  const deleteOpacity = useRef(new Animated.Value(0)).current;
-  const isSwiped = useRef(false);
-
-  const panResponder = useRef(
-    PanResponder.create({
-      onMoveShouldSetPanResponder: (_, gestureState) => {
-        if (isActive) return false;
-        return (
-          Math.abs(gestureState.dx) > Math.abs(gestureState.dy) &&
-          Math.abs(gestureState.dx) > 10
-        );
-      },
-      onPanResponderMove: (_, gestureState) => {
-        if (gestureState.dx < 0) {
-          translateX.setValue(gestureState.dx);
-        }
-      },
-      onPanResponderRelease: (_, gestureState) => {
-        if (gestureState.dx < SWIPE_THRESHOLD) {
-          handleSwipe(gestureState.dx);
-        } else {
-          handleSwipe(0);
-        }
-      },
-    }),
-  ).current;
-
-  const handleSwipe = useCallback(
-    (translationX: number) => {
-      if (translationX < SWIPE_THRESHOLD) {
-        // Show delete button
-        isSwiped.current = true;
-        Animated.parallel([
-          Animated.timing(translateX, {
-            toValue: -80,
-            duration: 200,
-            useNativeDriver: true,
-          }),
-          Animated.timing(deleteOpacity, {
-            toValue: 1,
-            duration: 200,
-            useNativeDriver: true,
-          }),
-        ]).start();
-      } else {
-        // Reset position
-        isSwiped.current = false;
-        Animated.parallel([
-          Animated.timing(translateX, {
-            toValue: 0,
-            duration: 200,
-            useNativeDriver: true,
-          }),
-          Animated.timing(deleteOpacity, {
-            toValue: 0,
-            duration: 200,
-            useNativeDriver: true,
-          }),
-        ]).start();
-      }
-    },
-    [translateX, deleteOpacity],
-  );
+  const swipeableRef = useRef<Swipeable>(null);
 
   const handleDelete = () => {
-    Animated.parallel([
-      Animated.timing(translateX, {
-        toValue: -SCREEN_WIDTH,
-        duration: 300,
-        useNativeDriver: true,
-      }),
-      Animated.timing(deleteOpacity, {
-        toValue: 0,
-        duration: 300,
-        useNativeDriver: true,
-      }),
-    ]).start(() => {
-      onDelete();
-    });
+    swipeableRef.current?.close();
+    onDelete();
   };
 
   const handlePress = () => {
-    if (isSwiped.current) {
-      // If swiped, reset position
-      handleSwipe(0);
-    } else {
-      // Otherwise, toggle quest
-      onChange(!isChecked);
-    }
+    onChange(!isChecked);
+  };
+
+  const renderRightActions = (
+    progress: Animated.AnimatedInterpolation<number>,
+    dragX: Animated.AnimatedInterpolation<number>,
+  ) => {
+    const trans = dragX.interpolate({
+      inputRange: [-80, 0],
+      outputRange: [0, 80],
+      extrapolate: "clamp",
+    });
+
+    return (
+      <Animated.View
+        style={{
+          transform: [{ translateX: trans }],
+          width: 80,
+        }}
+      >
+        <Pressable
+          style={{
+            backgroundColor: colors.error,
+            justifyContent: "center",
+            alignItems: "center",
+            flex: 1,
+          }}
+          onPress={handleDelete}
+        >
+          <Text className="font-silk text-white text-lg">Delete</Text>
+        </Pressable>
+      </Animated.View>
+    );
   };
 
   return (
-    <Animated.View
-      style={{
-        transform: [{ translateX }],
+    <Swipeable
+      ref={swipeableRef}
+      renderRightActions={renderRightActions}
+      onSwipeableOpen={(direction) => {
+        if (direction === "right") {
+          // Logic for right swipe if needed
+        }
       }}
-      className="flex-row items-center"
-      {...panResponder.panHandlers}
+      enabled={!isActive}
     >
       {/* Main quest item */}
-      <Pressable onLongPress={drag} onPress={handlePress} style={{ flex: 1 }}>
-        <Animated.View
+      <Pressable onLongPress={drag} onPress={handlePress}>
+        <View
           className="flex-row items-center gap-2 p-4 flex-1"
           style={{
             backgroundColor: colors.background,
-            borderBottomWidth: 1,
-            borderBottomColor: colors.border,
             minHeight: 60,
           }}
         >
@@ -158,27 +103,8 @@ export function QuestItem({
               {title}
             </Text>
           </View>
-        </Animated.View>
+        </View>
       </Pressable>
-
-      {/* Delete button */}
-      <Animated.View
-        style={{
-          opacity: deleteOpacity,
-          position: "absolute",
-          right: 0,
-          top: 0,
-          bottom: 0,
-          width: 80,
-          backgroundColor: colors.error,
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      >
-        <Text className="font-silk text-white text-lg" onPress={handleDelete}>
-          Delete
-        </Text>
-      </Animated.View>
-    </Animated.View>
+    </Swipeable>
   );
 }
