@@ -25,7 +25,13 @@ export function ExperienceBar() {
       <Text className="font-silk text-sm" style={{ color: colors.secondary }}>
         Level {level} - {xp} / {100 * level}
       </Text>
-      <View className="h-2" style={{ backgroundColor: colors.background2 }}>
+      <View
+        className="h-2 border"
+        style={{
+          backgroundColor: colors.background2,
+          borderColor: colors.border,
+        }}
+      >
         <Animated.View
           className="h-2"
           style={{

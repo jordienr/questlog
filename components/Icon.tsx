@@ -9,6 +9,8 @@ const ICON_MAP = {
   lightbulb: require("../assets/icons/solid-lightbulb.svg").default,
   circle: require("../assets/icons/circle.svg").default,
   bookOpen: require("../assets/icons/solid-book-open.svg").default,
+  diamond: require("../assets/icons/diamond.svg").default,
+  diamondFilled: require("../assets/icons/diamond-filled.svg").default,
 } as const;
 
 type IconName = keyof typeof ICON_MAP;

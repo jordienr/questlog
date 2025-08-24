@@ -1,9 +1,6 @@
 module.exports = function (api) {
   api.cache(true);
-  let plugins = [
-
-    // worklets has to be listed last!
-    'react-native-worklets/plugin' ];
+  let plugins = [];
 
   plugins.push("react-native-reanimated/plugin");
 

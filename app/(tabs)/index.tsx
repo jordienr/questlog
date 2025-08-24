@@ -91,7 +91,7 @@ export default function Home() {
         }
       >
         <View className="flex-1">
-          <View className="">
+          <View className="mx-8">
             <ExperienceBar />
           </View>
           {quests.length === 0 && (
@@ -123,23 +123,26 @@ export default function Home() {
             </View>
           )}
           <View
-            className="flex-1"
+            className="flex-1 px-6 pt-6"
             style={{
-              backgroundColor: colors.background2,
-              borderColor: colors.border,
+              backgroundColor: colors.background,
             }}
           >
             <DraggableFlatList
               data={quests}
               onDragEnd={({ data }) => reorderQuests(data)}
-              keyExtractor={(item) => item.title}
+              keyExtractor={(item) => item.id}
               className="h-full"
               contentContainerStyle={{ paddingBottom: 24 }}
               renderItem={({ item, drag, isActive }) => {
                 return (
-                  <ScaleDecorator>
+                  <ScaleDecorator activeScale={0.98}>
                     <SwipeableItem
                       item={item}
+                      swipeEnabled={!isActive}
+                      activationThreshold={8}
+                      overSwipe={12}
+                      swipeDamping={0.85}
                       snapPointsLeft={[80]}
                       renderUnderlayLeft={() => (
                         <Pressable
@@ -172,6 +175,7 @@ export default function Home() {
                         isChecked={item.isChecked}
                         onChange={() => {
                           const wasCompleted = item.isChecked;
+
                           toggleQuest(item.id ?? item.title);
 
                           if (!wasCompleted) {

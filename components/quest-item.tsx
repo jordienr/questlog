@@ -1,5 +1,7 @@
 import { Text, TouchableHighlight, View } from "react-native";
+import { useSwipeableItemParams } from "react-native-swipeable-item";
 import { useThemeColors } from "./ThemeProvider";
+import * as Haptics from "expo-haptics";
 
 export function QuestItem({
   title,
@@ -17,14 +19,21 @@ export function QuestItem({
   isActive?: boolean;
 }) {
   const colors = useThemeColors();
+  const { percentOpenLeft, percentOpenRight } = useSwipeableItemParams<any>();
 
   const handlePress = () => {
+    const leftOpen = percentOpenLeft?.value ?? 0;
+    const rightOpen = percentOpenRight?.value ?? 0;
+    if (leftOpen > 0.01 || rightOpen > 0.01) return;
     onChange(!isChecked);
   };
 
   return (
     <TouchableHighlight
-      onLongPress={drag}
+      onLongPress={() => {
+        drag?.();
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      }}
       onPress={handlePress}
       disabled={isActive}
     >

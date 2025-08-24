@@ -86,9 +86,23 @@ export function QuestCompletionOverlay({
           opacity: fadeAnim,
         }}
       >
+        {didLevelUp && newLevel && (
+          <Text
+            className="font-silk text-xl text-center"
+            style={{
+              backgroundColor: colors.background,
+              paddingHorizontal: 10,
+              paddingVertical: 3,
+              color: colors.overlayAccent,
+              fontWeight: "bold",
+            }}
+          >
+            Level {newLevel} Reached
+          </Text>
+        )}
         {/* Main Quest Completed Text */}
         <Text
-          className="font-jac text-6xl text-center mb-4"
+          className="font-jac text-6xl text-center mb-4 mt-4"
           style={{
             color: colors.overlayText,
           }}
@@ -125,18 +139,6 @@ export function QuestCompletionOverlay({
           >
             +{experienceGained} XP
           </Text>
-
-          {didLevelUp && newLevel && (
-            <Text
-              className="font-silk text-xl text-center"
-              style={{
-                color: colors.overlayAccent,
-                fontWeight: "bold",
-              }}
-            >
-              Level {newLevel} Reached
-            </Text>
-          )}
         </View>
       </Animated.View>
     </View>
