@@ -1,7 +1,7 @@
 import "../global.css";
 
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { Redirect, router, Stack } from "expo-router";
+import { router, Stack } from "expo-router";
 import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
@@ -12,7 +12,6 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 SplashScreen.preventAutoHideAsync();
 
 export const unstable_settings = {
-  // Ensure that reloading on `/modal` keeps a back button present.
   initialRouteName: "(tabs)",
 };
 
@@ -22,21 +21,20 @@ export default function RootLayout() {
     Jacquard24_400Regular: require("../assets/fonts/Jacquard24_400Regular.ttf"),
   });
 
-  const {
-    player: { name },
-  } = useGameStore();
+  const name = useGameStore((state) => state.player.name);
+  const storeHydrated = useGameStore((state) => state.hydrated);
 
   useEffect(() => {
-    if (fontsLoaded) {
-      SplashScreen.hideAsync();
+    if (!fontsLoaded || !storeHydrated) return;
 
-      setTimeout(() => {
-        if (!name || name.length === 0) {
-          router.replace("/(onboarding)");
-        }
-      }, 1000);
-    }
-  }, [fontsLoaded, name]);
+    const hasName = typeof name === "string" && name.trim().length > 0;
+    router.replace(hasName ? "/(tabs)" : "/(onboarding)");
+    SplashScreen.hideAsync();
+  }, [fontsLoaded, storeHydrated, name]);
+
+  if (!fontsLoaded) {
+    return null;
+  }
 
   return (
     <SafeAreaProvider>

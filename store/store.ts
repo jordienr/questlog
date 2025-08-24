@@ -82,6 +82,10 @@ export interface GameState {
   achievements: Achievement[];
   newlyUnlockedAchievements: Achievement[];
 
+  // Hydration
+  hydrated: boolean;
+  setHydrated: (value: boolean) => void;
+
   // Actions
   setName: (name: string) => void;
   setLevel: (level: number) => void;
@@ -346,6 +350,8 @@ export const useGameStore = create<GameState>()(
       quests: [],
       achievements: defaultAchievements,
       newlyUnlockedAchievements: [],
+      hydrated: false,
+      setHydrated: (value: boolean) => set({ hydrated: value }),
 
       setName: (name: string) => {
         set((state) => ({
@@ -614,6 +620,9 @@ export const useGameStore = create<GameState>()(
     {
       name: "game-storage",
       storage: createJSONStorage(() => AsyncStorage),
+      onRehydrateStorage: () => (state, error) => {
+        state?.setHydrated(true);
+      },
       // Migration function to convert string dates back to Date objects
       migrate: (persistedState: any, version: number) => {
         if (persistedState && persistedState.achievements) {

@@ -23,7 +23,7 @@ function PixelTabBar({
       case "index":
         return "script";
       case "stats":
-        return "chart";
+        return "bookOpen";
       case "settings":
         return "lightbulb";
       default:

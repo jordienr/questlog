@@ -1,8 +1,10 @@
 import { View, Animated } from "react-native";
 import { useEffect, useRef, useState } from "react";
+import { useThemeColors } from "./ThemeProvider";
 
 export function TextBubble({ text }: { text: string }) {
-  // Split by newlines first, then by characters
+  const colors = useThemeColors();
+
   const lines = text.split("\n");
   const characters = lines.flatMap((line, lineIndex) =>
     line.split("").map((char) => ({ char, lineIndex })),
@@ -32,9 +34,9 @@ export function TextBubble({ text }: { text: string }) {
   }, [text]);
 
   return (
-    <View className="p-2">
+    <View>
       {lines.map((line, lineIndex) => (
-        <View key={lineIndex} className="flex flex-row">
+        <View key={lineIndex} className="flex-row p-2">
           {line.split("").map((char, charIndex) => {
             const globalIndex = characters.findIndex(
               (item) => item.char === char && item.lineIndex === lineIndex,
@@ -42,9 +44,10 @@ export function TextBubble({ text }: { text: string }) {
             return (
               <Animated.Text
                 key={`${lineIndex}-${charIndex}`}
-                className="text-black text-center font-silk"
+                className="font-silk"
                 style={{
                   opacity: animatedValues[globalIndex] || 0,
+                  color: colors.foreground,
                 }}
               >
                 {char}

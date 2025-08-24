@@ -10,6 +10,8 @@ import { PixelInput } from "~/components/pixel-input";
 import { PixelButton } from "~/components/PixelButton";
 import { useGameStore } from "~/store/store";
 import { AchievementToast } from "~/components/achievement-toast";
+import { TextBubble } from "~/components/text-bubble";
+import { TheWizard } from "~/components/the-wizard";
 
 export default function Settings() {
   const colors = useThemeColors();
@@ -111,6 +113,15 @@ export default function Settings() {
           >
             This will reset your player progress, quests, and all local data
           </Text>
+        </View>
+        <View
+          className="flex-row border-2 border-dashed"
+          style={{
+            borderColor: colors.accent,
+          }}
+        >
+          <TheWizard />
+          <TextBubble text="This is where I come to rest." />
         </View>
       </ScrollView>
       {/* Achievement Toast */}

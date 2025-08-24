@@ -1,4 +1,5 @@
 import { router } from "expo-router";
+import { useState } from "react";
 import { View, Text } from "react-native";
 import { Button } from "~/components/Button";
 import { PixelInput } from "~/components/pixel-input";
@@ -9,11 +10,10 @@ import { ThemeSwitcher } from "~/components/ThemeSwitcher";
 import { useGameStore } from "~/store/store";
 
 export default function Onboarding() {
-  const {
-    player: { name },
-    setName,
-  } = useGameStore();
+  const { setName: saveName } = useGameStore();
   const theme = useThemeColors();
+
+  const [name, setName] = useState("");
 
   return (
     <View
@@ -28,12 +28,12 @@ export default function Onboarding() {
           borderColor: theme.accent,
         }}
       >
-        <View className="flex-row items-center justify-center bg-white">
+        <View className="flex-row items-center justify-center">
           <TheWizard />
           <TextBubble
             text={`Greetings, traveler.
 I am the Wizard.
-How may I call you?`}
+What may I call you?`}
           />
         </View>
         <View className="py-4">
@@ -43,13 +43,16 @@ How may I call you?`}
             onChangeText={setName}
           />
         </View>
-        {name.length >= 2 && (
-          <Button
-            fullWidth
-            title="Continue"
-            onPress={() => router.push("/(tabs)")}
-          />
-        )}
+
+        <Button
+          fullWidth
+          disabled={name.length < 2}
+          title="Continue"
+          onPress={() => {
+            saveName(name);
+            router.replace("/(tabs)");
+          }}
+        />
       </View>
       <View className="mt-4 items-center justify-center">
         <Text className="font-silk text-lg text-center">Theme</Text>

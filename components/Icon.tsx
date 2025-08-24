@@ -8,6 +8,7 @@ const ICON_MAP = {
   chart: require("../assets/icons/solid-chart.svg").default,
   lightbulb: require("../assets/icons/solid-lightbulb.svg").default,
   circle: require("../assets/icons/circle.svg").default,
+  bookOpen: require("../assets/icons/solid-book-open.svg").default,
 } as const;
 
 type IconName = keyof typeof ICON_MAP;
