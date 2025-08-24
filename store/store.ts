@@ -30,7 +30,7 @@ export const useThemeStore = create<ThemeState>()(
   ),
 );
 
-export type Quest = { title: string; isChecked: boolean };
+export type Quest = { id: string; title: string; isChecked: boolean };
 
 export interface Achievement {
   id: string;
@@ -91,8 +91,8 @@ export interface GameState {
   setLevel: (level: number) => void;
   setXp: (xp: number) => void;
   addQuest: (title: string) => void;
-  toggleQuest: (title: string) => void;
-  removeQuest: (title: string) => void;
+  toggleQuest: (id: string) => void;
+  removeQuest: (id: string) => void;
   reorderQuests: (newQuests: Quest[]) => void;
   clearCompleted: () => void;
   reset: () => void;
@@ -399,7 +399,14 @@ export const useGameStore = create<GameState>()(
           return;
 
         set((state) => ({
-          quests: [{ title: trimmed, isChecked: false }, ...quests],
+          quests: [
+            {
+              id: `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+              title: trimmed,
+              isChecked: false,
+            },
+            ...quests,
+          ],
           player: {
             ...state.player,
             stats: {
@@ -411,15 +418,16 @@ export const useGameStore = create<GameState>()(
         get().checkAchievements();
       },
 
-      toggleQuest: (title: string) => {
+      toggleQuest: (id: string) => {
         const { quests } = get();
-        const quest = quests.find((q) => q.title === title);
+        const quest =
+          quests.find((q) => q.id === id) || quests.find((q) => q.title === id);
         if (!quest) return;
 
         const newIsChecked = !quest.isChecked;
         set((state) => ({
           quests: quests.map((q) =>
-            q.title === title ? { ...q, isChecked: newIsChecked } : q,
+            q.id === quest.id ? { ...q, isChecked: newIsChecked } : q,
           ),
           player: {
             ...state.player,
@@ -443,13 +451,14 @@ export const useGameStore = create<GameState>()(
         get().checkAchievements();
       },
 
-      removeQuest: (title: string) => {
+      removeQuest: (id: string) => {
         const { quests } = get();
-        const quest = quests.find((q) => q.title === title);
+        const quest =
+          quests.find((q) => q.id === id) || quests.find((q) => q.title === id);
         if (!quest) return;
 
         set((state) => ({
-          quests: quests.filter((q) => q.title !== title),
+          quests: quests.filter((q) => q.id !== quest.id),
           player: {
             ...state.player,
             stats: {
@@ -637,6 +646,17 @@ export const useGameStore = create<GameState>()(
                   : achievement.unlockedAt,
             }),
           );
+        }
+        // Ensure quests have stable ids after migration
+        if (persistedState && Array.isArray(persistedState.quests)) {
+          persistedState.quests = persistedState.quests.map((q: any) => ({
+            id:
+              typeof q.id === "string"
+                ? q.id
+                : `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+            title: q.title,
+            isChecked: !!q.isChecked,
+          }));
         }
         return persistedState;
       },

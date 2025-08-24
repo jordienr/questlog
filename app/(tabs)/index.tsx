@@ -7,9 +7,9 @@ import {
   TextInput,
   Pressable,
   Alert,
-  SafeAreaView,
   KeyboardAvoidingView,
   Platform,
+  TouchableOpacity,
 } from "react-native";
 import { useThemeColors } from "~/components/ThemeProvider";
 import { Button } from "~/components/Button";
@@ -22,6 +22,7 @@ import { AchievementToast } from "~/components/achievement-toast";
 import DraggableFlatList, {
   ScaleDecorator,
 } from "react-native-draggable-flatlist";
+import SwipeableItem from "react-native-swipeable-item";
 
 export default function Home() {
   const colors = useThemeColors();
@@ -90,7 +91,7 @@ export default function Home() {
           ) : null
         }
       >
-        <View>
+        <View className="flex-1">
           <View className="p-2">
             <ExperienceBar />
           </View>
@@ -122,26 +123,55 @@ export default function Home() {
               </View>
             </View>
           )}
-          <SafeAreaView
-            className="p-4 pt-12 mt-2"
+          <View
+            className="flex-1 p-4 pt-12 mt-2"
             style={{ backgroundColor: colors.background2 }}
           >
-            {quests.length > 0 && (
-              <DraggableFlatList
-                data={quests}
-                onDragEnd={({ data }) => reorderQuests(data)}
-                keyExtractor={(item) => item.title}
-                renderItem={({ item, drag, isActive }) => {
-                  return (
-                    <ScaleDecorator>
+            <DraggableFlatList
+              data={quests}
+              onDragEnd={({ data }) => reorderQuests(data)}
+              keyExtractor={(item) => item.title}
+              contentContainerStyle={{ paddingBottom: 24 }}
+              renderItem={({ item, drag, isActive }) => {
+                return (
+                  <ScaleDecorator>
+                    <SwipeableItem
+                      item={item}
+                      overSwipe={24}
+                      snapPointsRight={[40]}
+                      renderUnderlayRight={() => (
+                        <Pressable
+                          onPress={() =>
+                            Alert.alert(
+                              "Delete quest",
+                              `Are you sure you want to delete "${item.title}"?`,
+                              [
+                                { text: "Cancel", style: "cancel" },
+                                {
+                                  text: "Delete",
+                                  style: "destructive",
+                                  onPress: () =>
+                                    removeQuest(item.id ?? item.title),
+                                },
+                              ],
+                            )
+                          }
+                          className="h-full items-center justify-center px-4"
+                          style={{ backgroundColor: colors.error }}
+                        >
+                          <Text className="font-silk text-white text-lg">
+                            Delete
+                          </Text>
+                        </Pressable>
+                      )}
+                    >
                       <QuestItem
                         title={item.title}
                         isChecked={item.isChecked}
                         onChange={() => {
                           const wasCompleted = item.isChecked;
-                          toggleQuest(item.title);
+                          toggleQuest(item.id ?? item.title);
 
-                          // Only show completion modal when completing a quest (not uncompleting)
                           if (!wasCompleted) {
                             const xpModifier = level > 10 ? 10 : 20;
                             const newXp = xp + xpModifier;
@@ -149,7 +179,6 @@ export default function Home() {
                             const finalXp = didLevelUp ? 0 : newXp;
                             const finalLevel = didLevelUp ? level + 1 : level;
 
-                            // Update player state
                             if (didLevelUp) {
                               setLevel(finalLevel);
                               setXp(finalXp);
@@ -157,7 +186,6 @@ export default function Home() {
                               setXp(finalXp);
                             }
 
-                            // Show completion modal
                             setCompletionData({
                               questTitle: item.title,
                               experienceGained: xpModifier,
@@ -167,7 +195,6 @@ export default function Home() {
                             });
                             setShowCompletionOverlay(true);
                           } else {
-                            // Uncompleting a quest
                             const xpModifier = level > 10 ? 10 : 20;
                             const xpChange = -xpModifier;
                             const newXp = xp + xpChange;
@@ -182,29 +209,16 @@ export default function Home() {
                             }
                           }
                         }}
-                        onDelete={() => {
-                          Alert.alert(
-                            "Delete quest",
-                            `Are you sure you want to delete "${item.title}"?`,
-                            [
-                              { text: "Cancel", style: "cancel" },
-                              {
-                                text: "Delete",
-                                style: "destructive",
-                                onPress: () => removeQuest(item.title),
-                              },
-                            ],
-                          );
-                        }}
+                        onDelete={() => removeQuest(item.id ?? item.title)}
                         drag={drag}
                         isActive={isActive}
                       />
-                    </ScaleDecorator>
-                  );
-                }}
-              />
-            )}
-          </SafeAreaView>
+                    </SwipeableItem>
+                  </ScaleDecorator>
+                );
+              }}
+            />
+          </View>
         </View>
       </MainLayout>
       <Modal
