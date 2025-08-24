@@ -9,7 +9,6 @@ import {
   Alert,
   KeyboardAvoidingView,
   Platform,
-  TouchableOpacity,
 } from "react-native";
 import { useThemeColors } from "~/components/ThemeProvider";
 import { Button } from "~/components/Button";
@@ -124,7 +123,7 @@ export default function Home() {
             </View>
           )}
           <View
-            className="flex-1 p-4 pt-12 mt-2"
+            className="flex-1 mt-12"
             style={{ backgroundColor: colors.background2 }}
           >
             <DraggableFlatList
@@ -137,18 +136,17 @@ export default function Home() {
                   <ScaleDecorator>
                     <SwipeableItem
                       item={item}
-                      overSwipe={24}
-                      snapPointsRight={[40]}
-                      renderUnderlayRight={() => (
+                      snapPointsLeft={[80]}
+                      renderUnderlayLeft={() => (
                         <Pressable
                           onPress={() =>
                             Alert.alert(
-                              "Delete quest",
-                              `Are you sure you want to delete "${item.title}"?`,
+                              "Vanish quest",
+                              `This will delete "${item.title}" from your questlog.`,
                               [
                                 { text: "Cancel", style: "cancel" },
                                 {
-                                  text: "Delete",
+                                  text: "Vanish",
                                   style: "destructive",
                                   onPress: () =>
                                     removeQuest(item.id ?? item.title),
@@ -156,11 +154,11 @@ export default function Home() {
                               ],
                             )
                           }
-                          className="h-full items-center justify-center px-4"
-                          style={{ backgroundColor: colors.error }}
+                          className="h-full ml-auto items-center justify-center"
+                          style={{ backgroundColor: colors.error, width: 80 }}
                         >
-                          <Text className="font-silk text-white text-lg">
-                            Delete
+                          <Text className="font-silk text-white text-sm">
+                            VANISH
                           </Text>
                         </Pressable>
                       )}

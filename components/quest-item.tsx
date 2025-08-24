@@ -1,4 +1,4 @@
-import { Text, Pressable, View, TouchableOpacity } from "react-native";
+import { Text, Touchable, TouchableHighlight, View } from "react-native";
 import { useThemeColors } from "./ThemeProvider";
 
 export function QuestItem({
@@ -23,7 +23,7 @@ export function QuestItem({
   };
 
   return (
-    <TouchableOpacity
+    <TouchableHighlight
       onLongPress={drag}
       onPress={handlePress}
       disabled={isActive}
@@ -55,6 +55,6 @@ export function QuestItem({
           </Text>
         </View>
       </View>
-    </TouchableOpacity>
+    </TouchableHighlight>
   );
 }
