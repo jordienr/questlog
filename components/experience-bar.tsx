@@ -21,10 +21,7 @@ export function ExperienceBar() {
   }, [xp, level, animatedWidth]);
 
   return (
-    <View
-      className="border-2 border-dashed p-2"
-      style={{ borderColor: colors.border }}
-    >
+    <View className="p-2">
       <Text className="font-silk text-sm" style={{ color: colors.secondary }}>
         Level {level} - {xp} / {100 * level}
       </Text>

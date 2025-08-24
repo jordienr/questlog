@@ -1,4 +1,4 @@
-import { Text, Touchable, TouchableHighlight, View } from "react-native";
+import { Text, TouchableHighlight, View } from "react-native";
 import { useThemeColors } from "./ThemeProvider";
 
 export function QuestItem({

@@ -91,7 +91,7 @@ export default function Home() {
         }
       >
         <View className="flex-1">
-          <View className="p-2">
+          <View className="">
             <ExperienceBar />
           </View>
           {quests.length === 0 && (
@@ -123,13 +123,17 @@ export default function Home() {
             </View>
           )}
           <View
-            className="flex-1 mt-12"
-            style={{ backgroundColor: colors.background2 }}
+            className="flex-1"
+            style={{
+              backgroundColor: colors.background2,
+              borderColor: colors.border,
+            }}
           >
             <DraggableFlatList
               data={quests}
               onDragEnd={({ data }) => reorderQuests(data)}
               keyExtractor={(item) => item.title}
+              className="h-full"
               contentContainerStyle={{ paddingBottom: 24 }}
               renderItem={({ item, drag, isActive }) => {
                 return (
