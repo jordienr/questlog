@@ -115,7 +115,7 @@ export default function Settings() {
           </Text>
         </View>
         <View
-          className="flex-row border-2 border-dashed"
+          className="flex-row"
           style={{
             borderColor: colors.accent,
           }}

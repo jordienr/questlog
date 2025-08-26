@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { clock } from "~/lib/clock";
 
 export type ThemeType = "dark" | "light" | "parchment";
 
@@ -30,7 +31,15 @@ export const useThemeStore = create<ThemeState>()(
   ),
 );
 
-export type Quest = { id: string; title: string; isChecked: boolean };
+export type Quest = {
+  id: string;
+  title: string;
+  isChecked: boolean;
+  type: "simple" | "recurring";
+  lastChecked?: number;
+  streak?: number;
+  activeDays?: number[]; // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+};
 
 export interface Achievement {
   id: string;
@@ -50,9 +59,11 @@ export interface AchievementRequirement {
     | "quests_deleted"
     | "level_reached"
     | "xp_gained"
-    | "current_streak";
+    | "current_streak"
+    | "specific_quest_completed";
   value: number;
   current: number;
+  questTitle?: string; // For specific quest achievements
 }
 
 export interface PlayerStats {
@@ -90,7 +101,11 @@ export interface GameState {
   setName: (name: string) => void;
   setLevel: (level: number) => void;
   setXp: (xp: number) => void;
-  addQuest: (title: string) => void;
+  addQuest: (
+    title: string,
+    isRecurring?: boolean,
+    activeDays?: number[],
+  ) => void;
   toggleQuest: (id: string) => void;
   removeQuest: (id: string) => void;
   reorderQuests: (newQuests: Quest[]) => void;
@@ -99,6 +114,8 @@ export interface GameState {
   unlockAchievement: (achievementId: string) => void;
   checkAchievements: () => void;
   clearNewlyUnlockedAchievements: () => void;
+  resetHabits: () => void;
+  isQuestVisibleToday: (quest: Quest) => boolean;
 }
 
 // Default achievements
@@ -327,6 +344,232 @@ const defaultAchievements: Achievement[] = [
       { type: "current_streak", value: 5, current: 0 },
     ],
   },
+  // Quest-specific achievements
+  {
+    id: "book_reader",
+    title: "Bookworm",
+    description: "Complete the quest: Read a book",
+    category: "quests",
+    isUnlocked: false,
+    requirements: [
+      {
+        type: "specific_quest_completed",
+        value: 1,
+        current: 0,
+        questTitle: "Read a book",
+      },
+    ],
+  },
+  {
+    id: "musician",
+    title: "Musician",
+    description: "Complete the quest: Learn an instrument",
+    category: "quests",
+    isUnlocked: false,
+    requirements: [
+      {
+        type: "specific_quest_completed",
+        value: 1,
+        current: 0,
+        questTitle: "Learn an instrument",
+      },
+    ],
+  },
+  {
+    id: "mountain_climber",
+    title: "Mountain Climber",
+    description: "Complete the quest: Climb a mountain",
+    category: "quests",
+    isUnlocked: false,
+    requirements: [
+      {
+        type: "specific_quest_completed",
+        value: 1,
+        current: 0,
+        questTitle: "Climb a mountain",
+      },
+    ],
+  },
+  {
+    id: "fitness_enthusiast",
+    title: "Fitness Enthusiast",
+    description: "Complete the quest: Exercise for 30 minutes",
+    category: "quests",
+    isUnlocked: false,
+    requirements: [
+      {
+        type: "specific_quest_completed",
+        value: 1,
+        current: 0,
+        questTitle: "Exercise for 30 minutes",
+      },
+    ],
+  },
+  {
+    id: "cook",
+    title: "Home Chef",
+    description: "Complete the quest: Cook a meal from scratch",
+    category: "quests",
+    isUnlocked: false,
+    requirements: [
+      {
+        type: "specific_quest_completed",
+        value: 1,
+        current: 0,
+        questTitle: "Cook a meal from scratch",
+      },
+    ],
+  },
+  {
+    id: "artist",
+    title: "Artist",
+    description: "Complete the quest: Draw or paint something",
+    category: "quests",
+    isUnlocked: false,
+    requirements: [
+      {
+        type: "specific_quest_completed",
+        value: 1,
+        current: 0,
+        questTitle: "Draw or paint something",
+      },
+    ],
+  },
+  {
+    id: "meditation_master",
+    title: "Zen Master",
+    description: "Complete the quest: Meditate for 10 minutes",
+    category: "quests",
+    isUnlocked: false,
+    requirements: [
+      {
+        type: "specific_quest_completed",
+        value: 1,
+        current: 0,
+        questTitle: "Meditate for 10 minutes",
+      },
+    ],
+  },
+  {
+    id: "language_learner",
+    title: "Polyglot",
+    description: "Complete the quest: Practice a foreign language",
+    category: "quests",
+    isUnlocked: false,
+    requirements: [
+      {
+        type: "specific_quest_completed",
+        value: 1,
+        current: 0,
+        questTitle: "Practice a foreign language",
+      },
+    ],
+  },
+  {
+    id: "gardener",
+    title: "Green Thumb",
+    description: "Complete the quest: Water the plants",
+    category: "quests",
+    isUnlocked: false,
+    requirements: [
+      {
+        type: "specific_quest_completed",
+        value: 1,
+        current: 0,
+        questTitle: "Water the plants",
+      },
+    ],
+  },
+  {
+    id: "writer",
+    title: "Wordsmith",
+    description: "Complete the quest: Write 500 words",
+    category: "quests",
+    isUnlocked: false,
+    requirements: [
+      {
+        type: "specific_quest_completed",
+        value: 1,
+        current: 0,
+        questTitle: "Write 500 words",
+      },
+    ],
+  },
+  {
+    id: "photographer",
+    title: "Snapshot Artist",
+    description: "Complete the quest: Take a photo",
+    category: "quests",
+    isUnlocked: false,
+    requirements: [
+      {
+        type: "specific_quest_completed",
+        value: 1,
+        current: 0,
+        questTitle: "Take a photo",
+      },
+    ],
+  },
+  {
+    id: "volunteer",
+    title: "Community Helper",
+    description: "Complete the quest: Help someone in need",
+    category: "quests",
+    isUnlocked: false,
+    requirements: [
+      {
+        type: "specific_quest_completed",
+        value: 1,
+        current: 0,
+        questTitle: "Help someone in need",
+      },
+    ],
+  },
+  {
+    id: "fisherman",
+    title: "Angler",
+    description: "Complete the quest: Fish a fish",
+    category: "quests",
+    isUnlocked: false,
+    requirements: [
+      {
+        type: "specific_quest_completed",
+        value: 1,
+        current: 0,
+        questTitle: "Fish a fish",
+      },
+    ],
+  },
+  {
+    id: "runner",
+    title: "Distance Runner",
+    description: "Complete the quest: Run 5km",
+    category: "quests",
+    isUnlocked: false,
+    requirements: [
+      {
+        type: "specific_quest_completed",
+        value: 1,
+        current: 0,
+        questTitle: "Run 5km",
+      },
+    ],
+  },
+  {
+    id: "kayaker",
+    title: "River Explorer",
+    description: "Complete the quest: Go kayaking",
+    category: "quests",
+    isUnlocked: false,
+    requirements: [
+      {
+        type: "specific_quest_completed",
+        value: 1,
+        current: 0,
+        questTitle: "Go kayaking",
+      },
+    ],
+  },
 ];
 
 export const useGameStore = create<GameState>()(
@@ -352,6 +595,15 @@ export const useGameStore = create<GameState>()(
       newlyUnlockedAchievements: [],
       hydrated: false,
       setHydrated: (value: boolean) => set({ hydrated: value }),
+
+      // Helper function to check if a quest should be visible today
+      isQuestVisibleToday: (quest: Quest) => {
+        if (quest.type !== "recurring") return true;
+        if (!quest.activeDays || quest.activeDays.length === 0) return true;
+
+        const today = clock.getWeekdayNumber(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+        return quest.activeDays.includes(today);
+      },
 
       setName: (name: string) => {
         set((state) => ({
@@ -390,7 +642,11 @@ export const useGameStore = create<GameState>()(
         get().checkAchievements();
       },
 
-      addQuest: (title: string) => {
+      addQuest: (
+        title: string,
+        isRecurring?: boolean,
+        activeDays?: number[],
+      ) => {
         const trimmed = title.trim();
         if (!trimmed) return;
 
@@ -404,6 +660,15 @@ export const useGameStore = create<GameState>()(
               id: `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
               title: trimmed,
               isChecked: false,
+              type: isRecurring ? "recurring" : "simple",
+              ...(isRecurring && {
+                lastChecked: undefined,
+                streak: 0,
+                activeDays:
+                  activeDays && activeDays.length > 0
+                    ? activeDays
+                    : [0, 1, 2, 3, 4, 5, 6], // Default to every day if none selected
+              }),
             },
             ...quests,
           ],
@@ -426,9 +691,20 @@ export const useGameStore = create<GameState>()(
 
         const newIsChecked = !quest.isChecked;
         set((state) => ({
-          quests: quests.map((q) =>
-            q.id === quest.id ? { ...q, isChecked: newIsChecked } : q,
-          ),
+          quests: quests.map((q) => {
+            if (q.id !== quest.id) return q;
+            if (q.type === "recurring") {
+              return {
+                ...q,
+                isChecked: newIsChecked,
+                lastChecked: newIsChecked ? Date.now() : undefined,
+                streak: newIsChecked
+                  ? (q.streak || 0) + 1
+                  : Math.max(0, (q.streak || 0) - 1),
+              };
+            }
+            return { ...q, isChecked: newIsChecked };
+          }),
           player: {
             ...state.player,
             stats: {
@@ -482,19 +758,21 @@ export const useGameStore = create<GameState>()(
 
       clearCompleted: () => {
         const { quests } = get();
-        const completedQuests = quests.filter((q) => q.isChecked);
+        const completedOneTimeQuests = quests.filter(
+          (q) => q.isChecked && q.type !== "recurring",
+        );
 
         set((state) => ({
-          quests: quests.filter((q) => !q.isChecked),
+          quests: quests.filter(
+            (q) => !completedOneTimeQuests.some((cq) => cq.id === q.id),
+          ),
           player: {
             ...state.player,
             stats: {
               ...state.player.stats,
               totalQuestsDeleted:
-                state.player.stats.totalQuestsDeleted + completedQuests.length,
-              totalQuestsCompleted:
-                state.player.stats.totalQuestsCompleted -
-                completedQuests.length,
+                state.player.stats.totalQuestsDeleted +
+                completedOneTimeQuests.length,
             },
           },
         }));
@@ -579,6 +857,15 @@ export const useGameStore = create<GameState>()(
               case "current_streak":
                 current = player.stats.currentStreak;
                 break;
+              case "specific_quest_completed":
+                // Check if the specific quest has been completed
+                const { quests } = get();
+                const questTitle = req.questTitle;
+                if (questTitle) {
+                  const quest = quests.find((q) => q.title === questTitle);
+                  current = quest && quest.isChecked ? 1 : 0;
+                }
+                break;
             }
 
             return { ...req, current };
@@ -625,6 +912,37 @@ export const useGameStore = create<GameState>()(
           newlyUnlockedAchievements: [],
         }));
       },
+
+      resetHabits: () => {
+        const today = clock.now();
+        today.setHours(0, 0, 0, 0);
+        const yesterday = new Date(today);
+        yesterday.setDate(today.getDate() - 1);
+
+        set((state) => ({
+          quests: state.quests.map((quest) => {
+            if (quest.type !== "recurring" || !quest.isChecked) {
+              return quest;
+            }
+
+            const lastCheckedDate = new Date(quest.lastChecked!);
+            lastCheckedDate.setHours(0, 0, 0, 0);
+
+            if (lastCheckedDate < today) {
+              // Reset isChecked for the new day
+              const updatedQuest = { ...quest, isChecked: false };
+
+              // If last checked was not yesterday, reset streak
+              if (lastCheckedDate < yesterday) {
+                updatedQuest.streak = 0;
+              }
+              return updatedQuest;
+            }
+
+            return quest;
+          }),
+        }));
+      },
     }),
     {
       name: "game-storage",
@@ -656,6 +974,12 @@ export const useGameStore = create<GameState>()(
                 : `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
             title: q.title,
             isChecked: !!q.isChecked,
+            type: q.isRecurring ? "recurring" : "simple",
+            lastChecked: q.lastChecked,
+            streak: q.streak,
+            activeDays:
+              q.activeDays ||
+              (q.isRecurring ? [0, 1, 2, 3, 4, 5, 6] : undefined),
           }));
         }
         return persistedState;

@@ -6,6 +6,9 @@ import * as Haptics from "expo-haptics";
 export function QuestItem({
   title,
   isChecked,
+  isRecurring,
+  streak,
+  activeDays,
   onChange,
   onDelete,
   drag,
@@ -13,6 +16,9 @@ export function QuestItem({
 }: {
   title: string;
   isChecked: boolean;
+  isRecurring?: boolean;
+  streak?: number;
+  activeDays?: number[];
   onChange: (isChecked: boolean) => void;
   onDelete: () => void;
   drag?: () => void;
@@ -62,6 +68,42 @@ export function QuestItem({
           >
             {title}
           </Text>
+          {isRecurring && (
+            <View className="flex-row items-center mt-1">
+              <Text
+                className="text-xs font-silk mr-2"
+                style={{ color: colors.secondary }}
+              >
+                🔄 Habit
+              </Text>
+              {activeDays && activeDays.length > 0 && (
+                <Text
+                  className="text-xs font-silk mr-2"
+                  style={{ color: colors.secondary }}
+                >
+                  {activeDays.length === 7
+                    ? "Daily"
+                    : activeDays.length === 5 &&
+                        activeDays.includes(1) &&
+                        activeDays.includes(5)
+                      ? "Weekdays"
+                      : activeDays.length === 2 &&
+                          activeDays.includes(0) &&
+                          activeDays.includes(6)
+                        ? "Weekends"
+                        : `Days: ${activeDays.map((d) => ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][d]).join(", ")}`}
+                </Text>
+              )}
+              {streak !== undefined && streak > 0 && (
+                <Text
+                  className="text-xs font-silk"
+                  style={{ color: colors.primary }}
+                >
+                  🔥 {streak} day{streak === 1 ? "" : "s"}
+                </Text>
+              )}
+            </View>
+          )}
         </View>
       </View>
     </TouchableHighlight>

@@ -22,6 +22,7 @@ import DraggableFlatList, {
   ScaleDecorator,
 } from "react-native-draggable-flatlist";
 import SwipeableItem from "react-native-swipeable-item";
+import { clock } from "~/lib/clock";
 
 export default function Home() {
   const colors = useThemeColors();
@@ -36,9 +37,13 @@ export default function Home() {
     setLevel,
     newlyUnlockedAchievements,
     clearNewlyUnlockedAchievements,
+    resetHabits,
+    isQuestVisibleToday,
   } = useGameStore();
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [newTitle, setNewTitle] = useState("");
+  const [isRecurring, setIsRecurring] = useState(false);
+  const [selectedDays, setSelectedDays] = useState<number[]>([]);
   const inputRef = useRef<TextInput>(null);
 
   // Quest completion overlay state
@@ -70,6 +75,11 @@ export default function Home() {
       clearNewlyUnlockedAchievements();
     }
   }, [newlyUnlockedAchievements, clearNewlyUnlockedAchievements]);
+
+  // Reset habits when component mounts (daily reset)
+  useEffect(() => {
+    resetHabits();
+  }, [resetHabits]);
 
   // Handle quest completion overlay dismissal
   const handleOverlayComplete = useCallback(() => {
@@ -117,6 +127,8 @@ export default function Home() {
                     addQuest("Complete the tutorial");
                     addQuest("Read a book");
                     addQuest("Go for a walk");
+                    addQuest("Drink water", true, [0, 1, 2, 3, 4, 5, 6]); // Daily
+                    addQuest("Exercise", true, [1, 3, 5]); // Mon, Wed, Fri
                   }}
                 />
               </View>
@@ -129,7 +141,7 @@ export default function Home() {
             }}
           >
             <DraggableFlatList
-              data={quests}
+              data={quests.filter(isQuestVisibleToday)}
               onDragEnd={({ data }) => reorderQuests(data)}
               keyExtractor={(item) => item.id}
               className="h-full"
@@ -173,7 +185,16 @@ export default function Home() {
                       <QuestItem
                         title={item.title}
                         isChecked={item.isChecked}
-                        onChange={() => {
+                        isRecurring={item.type === "recurring"}
+                        streak={
+                          item.type === "recurring" ? item.streak : undefined
+                        }
+                        activeDays={
+                          item.type === "recurring"
+                            ? item.activeDays
+                            : undefined
+                        }
+                        onChange={(isChecked) => {
                           const wasCompleted = item.isChecked;
 
                           toggleQuest(item.id ?? item.title);
@@ -275,19 +296,114 @@ export default function Home() {
                 autoFocus
                 onSubmitEditing={() => {
                   if (!canSubmit) return;
-                  addQuest(newTitle);
+                  addQuest(
+                    newTitle,
+                    isRecurring,
+                    isRecurring ? selectedDays : undefined,
+                  );
                   setNewTitle("");
+                  setIsRecurring(false);
+                  setSelectedDays([]);
                   setIsAddOpen(false);
                 }}
                 returnKeyType="done"
               />
+              <View className="flex-row items-center mt-3">
+                <Pressable
+                  onPress={() => setIsRecurring(!isRecurring)}
+                  className="flex-row items-center"
+                >
+                  <View
+                    className="w-5 h-5 border-2 mr-2 items-center justify-center"
+                    style={{
+                      borderColor: colors.border,
+                      backgroundColor: isRecurring
+                        ? colors.primary
+                        : "transparent",
+                    }}
+                  >
+                    {isRecurring && (
+                      <Text className="text-white text-xs">✓</Text>
+                    )}
+                  </View>
+                  <Text
+                    className="font-silk text-sm"
+                    style={{ color: colors.foreground }}
+                  >
+                    Recurring quest (habit)
+                  </Text>
+                </Pressable>
+              </View>
+
+              {isRecurring && (
+                <View className="mt-3">
+                  <Text
+                    className="font-silk text-sm mb-2"
+                    style={{ color: colors.foreground }}
+                  >
+                    Active on:
+                  </Text>
+                  <View className="flex-row flex-wrap gap-1">
+                    {[
+                      { day: 0, label: "Sun" },
+                      { day: 1, label: "Mon" },
+                      { day: 2, label: "Tue" },
+                      { day: 3, label: "Wed" },
+                      { day: 4, label: "Thu" },
+                      { day: 5, label: "Fri" },
+                      { day: 6, label: "Sat" },
+                    ].map(({ day, label }) => (
+                      <Pressable
+                        key={day}
+                        onPress={() => {
+                          if (selectedDays.includes(day)) {
+                            setSelectedDays(
+                              selectedDays.filter((d) => d !== day),
+                            );
+                          } else {
+                            setSelectedDays([...selectedDays, day]);
+                          }
+                        }}
+                        className={`px-3 py-2 border-2 ${
+                          selectedDays.includes(day)
+                            ? "border-primary"
+                            : "border-border"
+                        }`}
+                        style={{
+                          backgroundColor: selectedDays.includes(day)
+                            ? colors.primary
+                            : "transparent",
+                        }}
+                      >
+                        <Text
+                          className="font-silk text-xs"
+                          style={{
+                            color: selectedDays.includes(day)
+                              ? colors.background
+                              : colors.foreground,
+                          }}
+                        >
+                          {label}
+                        </Text>
+                      </Pressable>
+                    ))}
+                  </View>
+                </View>
+              )}
+
               <View className="flex-row gap-3 mt-4">
                 <Button
                   title="Add"
                   onPress={() => {
                     if (!canSubmit) return;
-                    addQuest(newTitle);
+                    addQuest(
+                      newTitle,
+                      isRecurring,
+                      isRecurring ? selectedDays : undefined,
+                    );
                     setNewTitle("");
+                    setIsRecurring(false);
+                    setSelectedDays([]);
                     setIsAddOpen(false);
                   }}
                   disabled={!canSubmit}
@@ -298,6 +414,8 @@ export default function Home() {
                   onPress={() => {
                     setIsAddOpen(false);
                     setNewTitle("");
+                    setIsRecurring(false);
+                    setSelectedDays([]);
                   }}
                 />
               </View>
